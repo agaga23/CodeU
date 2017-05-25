@@ -8,30 +8,27 @@ struct Node{
   }
 };
 struct LList{
-  Node *head = NULL;
+  Node *head = NULL, *last = NULL;
+  int size = 0;
   void add(int v){
+	size ++;
 	if ( head == NULL ) {
 	  head = new Node(v);
+	  last = head;
 	  return;
 	}
-	Node *end = head;
-	while ( end -> next != NULL ) end = end -> next;
-	end -> next = new Node(v);
+	last -> next = new Node(v);
+	last = last -> next;
   }
-  Node findk(int k){
-	int siz = 0;
-	Node *end = head;
-	while ( end != NULL ){
-	  siz ++;
-	  end = end -> next;
-	}
+  Node* findk(int k){
 	int nr = 1;
+	if ( k < 0 || k >= size ) return NULL;
 	Node *kth = head;
-	while ( nr != ( siz - k ) ){
+	while ( nr != ( size - k ) ){
 	  kth = kth -> next;
 	  nr ++;
 	}
-	return *kth;
+	return kth;
   }
 };
 int main(){
@@ -40,6 +37,10 @@ int main(){
   x.add(1);
   x.add(29);
   x.add(8);
-  cout << x.findk(1).value << "\n";
+  
+  for ( int i = -1; i < 5; i ++ ){
+	  Node *kth = x.findk(i	);
+	  if ( kth != NULL ) cout << (*kth).value << "\n";
+	  else cout << "You gave wrong input.\n"; 
+	}
 }
-	
