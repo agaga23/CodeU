@@ -2,17 +2,17 @@
 using namespace std;
 struct Node{
   int value;
-  Node *next = NULL;
+  Node *next = nullptr;
 
   Node(int v) :value{v}{
   }
 };
 struct LList{
-  Node *head = NULL, *last = NULL;
+  Node *head = nullptr, *last = nullptr;
   int size = 0;
   void add(int v){
 	size ++;
-	if ( head == NULL ) {
+	if ( head == nullptr ) {
 	  head = new Node(v);
 	  last = head;
 	  return;
@@ -21,13 +21,9 @@ struct LList{
 	last = last -> next;
   }
   Node* findk(int k){
-	int nr = 1;
-	if ( k < 0 || k >= size ) return NULL;
+	if ( k < 0 || k >= size ) return nullptr;
 	Node *kth = head;
-	while ( nr != ( size - k ) ){
-	  kth = kth -> next;
-	  nr ++;
-	}
+	for ( int nr = 1; nr < (size - k); nr ++ ) kth = kth -> next;
 	return kth;
   }
 };
@@ -39,7 +35,7 @@ int main(){
   x.add(8);
   
   for ( int i = -1; i < 5; i ++ ){
-	  Node *kth = x.findk(i	);
+	  Node *kth = x.findk(i);
 	  if ( kth != NULL ) cout << (*kth).value << "\n";
 	  else cout << "You gave wrong input.\n"; 
 	}
