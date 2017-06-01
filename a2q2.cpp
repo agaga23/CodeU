@@ -38,18 +38,18 @@ struct Node{
 		out = time ++;
 		return time;
 	}
-	Node* lca ( Node* a, Node* b ){
-		if ( a-> in > b-> in ) swap ( a, b );
-		if ( b-> in <= a-> out ) return a; //a-> in -> b -> a-> out
-		
-		int mini_in  = min ( a -> in, b -> in );
-		int maxi_out = max ( a -> out, b -> out );
+	Node* lca ( Node* node1, Node* node2 ){
+		int mini_in  = min ( node1 -> in, node2 -> in );
+		int maxi_out = max ( node1 -> out, node2 -> out );
 		
 		Node *x = this;
+		//Start from the root (x), go down (left/right every time) as long as both nodes are in the subtree of x.
+		//The node a is in a subtree of another (name it c) if c.in <= a.in, a.out <= c.out
+		
 		while ( true ){
-			if ( x->Left != nullptr && x->Left -> in <= mini_in && x->Left -> out >= maxi_out ) x = x->Left;
+			if ( x->Left != nullptr && x->Left -> out >= maxi_out ) x = x->Left;
 			else {
-				if ( x->Right != nullptr && x->Right -> in <= mini_in && x->Right -> out >= maxi_out ) x = x->Right;
+				if ( x->Right != nullptr && x->Right -> in <= mini_in ) x = x->Right;
 				else return x;
 			}
 		}
@@ -62,19 +62,19 @@ int main(){
 		x[i] = new Node ( v );
 	}
 	cout << "\nStructure of tree: \n";
-	Node t = *x[0];
-	cout << x[0] -> value << "\n";
+	Node* t = x[0];
+	cout << t -> value << "\n";
 	for ( int i = 1; i <= 10; i ++ ){
-		t.addNode(x[i]);
+		t->addNode(x[i]);
 		cout << x[i]->value << "\n";
 	}
 	cout << "-------------------\n";
-	t.dfs(1);
+	t->dfs(1);
 //  pair<int,int> testtable[] = { {69, 9}, {54,41}, {105,105}, {54,149} {30,69} };
 	pair<int,int> testtable[] = { {6,0}, {5,4}, {8,8}, {10,5},{3,6} };
 	for ( int i = 0; i < 5; i ++ ){
 		Node* a = x[testtable[i].first];
 		Node* b = x[testtable[i].second];
-		cout << "lca of " << a->value << " " << b->value << " = " << t.lca(a,b)->value << "\n";
+		cout << "lca of " << a->value << " " << b->value << " = " << t->lca(a,b)->value << "\n";
 	}
 }
