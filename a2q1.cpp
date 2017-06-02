@@ -9,11 +9,15 @@ struct Node{
 		value = v;
 	}
 	void addNode(int val, int pos){
+		int initial_pos = pos;
+		//pos - position in binary tree where we want to add node counting down from root (from left to right) (level-traversal)
+		//counting starts from 1, then its left node = 2, right node = 3 etc.
 		int pos_level = 1;
-		while ( pos_level * 2 <= pos ) pos_level *= 2;
+		while ( pos_level * 2 <= pos ) pos_level *= 2; 
+		//pos_level - the level in tree, where our pos is, e.g positions 8,9,10,11,..,15 are on the pos_level = 8
 		
 		// Go through the tree from root to target place. Check if you should go left / right by checking on which half of the floor in tree is that position. Then go down in the tree and count the positions in the subtree from the beginning.
-		Node *x = this;		
+		Node *x = this;
 		while ( pos > 3 ){
 			int half = pos_level / 2;
 			if ( pos < pos_level + half ) { //left half
@@ -26,9 +30,11 @@ struct Node{
 				x = x -> Right;
 				pos -= pos_level;
 			}
-			pos_level /= 2;
+			pos_level /= 2; //every time after going down we look at the subtree of the changed x node and in this subtree our pos changed as well as pos_level
 		}
-		if ( pos > 3 ) cout << "you can't add node to the tree on that position - it doesn't have all his ancestors\n";
+		//if our pos is 2/3 we will add new node to our son
+		//if not => pos > 3 we need to go further, but finishing while above means - we can't, so error
+		if ( pos > 3 ) cerr << "you can't add node with value "<< val << " (at position " << initial_pos << ") to the tree - it doesn't have all his ancestors\n";
 		else {
 			if ( pos == 2 ) x -> Left = new Node(val);
 			else x -> Right = new Node(val);
@@ -55,6 +61,7 @@ int main(){
 		if ( i + 1 == enter_pos ) { cout << "\n"; enter_pos *= 2; }
 		cout << v << " ";
 	}
+	t.addNode(1, 30);
 	cout << "\n-------------------\n";
 	
 	for ( int i = 1; i <= 10; i += 3 ){		
