@@ -4,11 +4,14 @@
 #include <algorithm>
 using namespace std;
 struct Node{
+private:
+	Node* Up = nullptr;
+	bool tmp = false;
+public:
 	int value;
 	Node* Left = nullptr;
 	Node* Right = nullptr;
-	Node* Up = nullptr;
-	bool tmp = false;
+	
 	
 	Node (int v, Node* up){
 		value = v;
@@ -49,19 +52,25 @@ struct Node{
 
 		if ( Left != nullptr ){
 			Node* anc = Left -> findNode(nodeVal);
-			if ( anc != nullptr ) return move(anc);
+			if ( anc != nullptr ) return anc;
 		}
 		if ( Right != nullptr ){
 			Node* anc = Right -> findNode(nodeVal);
-			if ( anc != nullptr ) return move(anc);
+			if ( anc != nullptr ) return anc;
 		}
 		return nullptr;
 	}
-	int lowestCommonAncestor (int val1, int val2){
+	pair<bool,int> lowestCommonAncestor (int val1, int val2){
 		
 		//find pointers to both nodes in tree
 		Node* node1 = findNode(val1);
 		Node* node2 = findNode(val2);
+		
+		if ( node1 == nullptr || node2 == nullptr ){
+			if ( node1 == nullptr ) cerr << "The node with value " << val1 << " doesn't exist in tree\n";
+			if ( node2 == nullptr ) cerr << "The node with value " << val2 << " doesn't exist in tree\n";
+			return {false,0};
+		}
 
 		//mark all ancestors of node1
 		Node *goUp = node1;
@@ -71,29 +80,26 @@ struct Node{
 		}  
 		
 		//and go up with node2 finding the first marked node (first ancestor of both nodes)
-		int ans = -1;
+		int ans = 0;
+		bool found = false;
 		goUp = node2;
 		while ( goUp != nullptr ){
 			if ( goUp -> tmp == true ) {
 				ans = goUp -> value;
+				found = true;
 				break;
 			}
 			goUp = goUp -> Up;
 		}
 		
-		//unmark everything to be prepared for next querries
+		//unmark all ancestors of node1 to be prepared for next querries
 		goUp = node1;
 		while ( goUp != nullptr ){
 			goUp -> tmp = false;
 			goUp = goUp -> Up;
 		}
 		
-		if ( ans == -1 ) {
-			if ( node1 == nullptr ) cerr << "The node with value " << val1 << " doesn't exist in tree\n";
-			if ( node2 == nullptr ) cerr << "The node with value " << val2 << " doesn't exist in tree\n";
-			return -1;
-		}
-		return ans;
+		return {found, ans};
 	}
 };
 int main(){
@@ -109,8 +115,11 @@ int main(){
 	}
 	cout << "\n-------------------\n";
 
-	pair<int,int> testtable[] = { {69, 9}, {54,41}, {105,105}, {54,149}, {86,41} };
-	for ( int i = 0; i < 5; i ++ )
-		cout << "lca of " << testtable[i].first << "," << testtable[i].second << " is " << t.lowestCommonAncestor(testtable[i].first, testtable[i].second) << "\n";
-	
+	pair<int,int> testtable[] = { {69, 9}, {54,41}, {105,105}, {54,149}, {86,41}, {22,86} };
+	for ( int i = 0; i < 6; i ++ ){
+		pair<bool,int> lowestCommonAnc = t.lowestCommonAncestor(testtable[i].first, testtable[i].second);
+		
+		if ( lowestCommonAnc.first == true )
+			cout << "lca of " << testtable[i].first << "," << testtable[i].second << " is " << lowestCommonAnc.second << "\n";
+	}
 }
