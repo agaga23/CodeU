@@ -15,7 +15,7 @@ class Board{
 		prefix += array[row][column];
 	
 		if ( visitedCells[cell] == true ) return;
-		if ( !(dict -> isPrefix(prefix)) ) return; //bez !
+		if ( !dict -> isPrefix(prefix) ) return;
 
 		visitedCells[cell] = true;
 		if ( dict -> isWord(prefix) ) allWords.insert(prefix);
@@ -47,7 +47,6 @@ int main(){
 	Board boardGame(&array, &dict);	
 	for ( auto &word: boardGame.findAllWords() ) cout << word << " ";
 	cout << "\n";
-	
 	
 	Dictionary plDict({"rak","kora","kret","krety","kareta","karetka","teka","teczka","mapa","krem","korek","prom","tapeta","tora","tak","krew","marker"});
 	vector<vector<char> > array2 = {{'m','r','e'},{'a','k','o'},{'r','e','t'},{'m','p','a'}};
