@@ -1,5 +1,6 @@
 #include<string>
 #include<set>
+#include<unordered_set>
 #include<vector>
 using namespace std;
 class Dictionary{
@@ -13,14 +14,14 @@ public:
 		return allPrefixes.find(s) != allPrefixes.end();
 	}
 	Dictionary(vector<string> words){ //vector of words which should be in dict
-		for ( int i = 0; i < words.size(); i ++ ){
-
+		for ( string word: words ){
+			
 			string prefix = "";
-			for ( int j = 0; j < words[i].length(); j ++ ){
-				prefix += words[i][j];
+			for ( char c: word ) {
+				prefix += c;
 				allPrefixes.insert(prefix);
 			}
-			allWords.insert(words[i]);
+			allWords.insert( word );
 		}
 	}
 };
