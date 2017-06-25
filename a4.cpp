@@ -1,38 +1,43 @@
 #include<iostream>
 #include<vector>
+#include <assert.h>
 using namespace std;
 class visitedMap{
+	int rowSize = 0;
 	vector<vector<bool> > visited; // To find one island I will start on unvisited land and go as far as possible to mark all neighbouring lands as visited.
 	
-	void dfs( int x, int y ){
-		visited[x][y] = true;
+	void dfs( int y, int x ){
+		visited[y][x] = true;
 		
-		int change[] = {-1,0,1,0,-1}; //together changeX: [0-3] and changeY: [1-4]
+		int changeY[] = {-1,0,1,0}, changeX[] = {0,1,0,-1};
 		for ( int i = 0; i < 4; i ++ ){
-			int newX = x + change[i], newY = y + change[i + 1];
-			if( newX < 0 or newY < 0 or newX == visited.size() or newY == visited[0].size() ) continue;
-			if( !visited[newX][newY] ) dfs( newX, newY );
+			int newY = y + changeY[i], newX = x + changeX[i];
+			
+			if ( newY >= 0 && newY < visited.size() && newX >= 0 && newX < rowSize )
+				if( !visited[newY][newX] ) dfs( newY, newX );
 		}
 	}
 public:
 	int countIslands(){
 		int nrIslands = 0;
 
-		for ( int i = 0; i < visited.size(); i ++ ){
-			for ( int j = 0; j < visited[i].size(); j ++ ){
-				if ( !visited[i][j] ){
+		for ( int y = 0; y < visited.size(); y ++ ){
+			for ( int x = 0; x < rowSize; x ++ ){
+				if ( !visited[y][x] ){
 					nrIslands ++;
-					dfs( i, j );
+					dfs( y, x );
 				}
 			}
 		}
 		return nrIslands;
 	}	
 	visitedMap( const vector<vector<bool> >& array ){
-		visited.resize ( array.size(), vector<bool>(array[0].size(), false) );
-		for ( int i = 0; i < array.size(); i ++ ){
-			for ( int j = 0; j < array[i].size(); j ++ ){
-				if ( !array[i][j] ) visited[i][j] = true; //water can be marked as visited cell - I don't want to stand on it looking for land.
+		if ( array.size() ) rowSize = array[0].size();
+		
+		visited.resize ( array.size(), vector<bool>(rowSize, false) );
+		for ( int y = 0; y < array.size(); y ++ ){
+			for ( int x = 0; x < rowSize; x ++ ){
+				visited[y][x] = !array[y][x]; //water can be marked as visited cell - I don't want to stand on it looking for land.
 			}
 		}
 	}
@@ -42,13 +47,37 @@ int countIslands( const vector<vector<bool> >& array ){
 	visitedMap map( array );
 	return map.countIslands();
 }
-int main(){
-	bool f = false, t = true;
-	vector<vector<bool> > array = { { f, t, f, t }, { t, t, f, f }, { f, f, t, f }, { f, f, t, f } };
-	cout << "f.f.\n..ff\nff.f\nff.f\nf-water .-land\n";
-	cout << countIslands( array ) << "\n";
+int countIslandsFromString ( const vector<string> &array, int expectedValue ){
+	vector<vector<bool> > v;
+	v.resize ( array.size() );
+	int rowSize = 0;
+	if ( array.size()) rowSize = array[0].size();
+	
+	for ( int y = 0; y < array.size(); y ++ ){
+		string row = array[y];
+		assert(row.size() == rowSize);
+		
+		for ( int x = 0; x < rowSize; x ++ ){
+			bool cell = (row[x] == 't');
+			v[y].push_back(cell);
+		}
+	}
+	int islands = countIslands(v);
 
-	vector<vector<bool> > array2 = { { f, t, f }, { f, t, t }, { t, f, f }, { f, f, t }, { f, t, t }, { t, f, t } };
-	cout << "f.f\nf..\n.ff\nff.\nf..\n.f.\nf-water .-land\n";
-	cout << countIslands( array2 ) << "\n";
+	if ( islands != expectedValue ) {
+		for ( int y = 0; y < array.size(); y ++ ){
+			string row = array[y];
+			for ( int x = 0; x < row.size(); x ++ ) cout << row[x] << " ";
+			cout << "\n";
+		}
+		cerr << "Your value is " << islands << " and expected value is " << expectedValue << "\n";
+	}
+	return islands;
+}
+int main(){
+	vector<string> s = { "ftft", "ttff", "fftf", "fftf" };
+	cout << countIslandsFromString( s, 3 ) << "\n";
+
+	vector<string > s2 = { "ftf", "ftt", "tff", "fft", "ftt", "tft" };
+	cout << countIslandsFromString( s2, 4 ) << "\n";
 }
