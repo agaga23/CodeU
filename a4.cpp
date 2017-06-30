@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<algorithm>	
 #include <assert.h>
 using namespace std;
 class visitedMap{
@@ -32,11 +33,11 @@ public:
 		return nrIslands;
 	}	
 	visitedMap( const vector<vector<bool> >& array ){
-		if ( array.size() ) rowSize = array[0].size();
+		for ( int y = 0; y < array.size(); y ++ ) rowSize = max ( rowSize, (int)array[y].size() );
 		
 		visited.resize ( array.size(), vector<bool>(rowSize, false) );
 		for ( int y = 0; y < array.size(); y ++ ){
-			for ( int x = 0; x < rowSize; x ++ ){
+			for ( int x = 0; x < array[y].size(); x ++ ){
 				visited[y][x] = !array[y][x]; //water can be marked as visited cell - I don't want to stand on it looking for land.
 			}
 		}
