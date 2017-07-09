@@ -3,7 +3,7 @@
 #include<algorithm>	
 #include <assert.h>
 using namespace std;
-class visitedMap{
+class VisitedMap{
 	int rowSize = 0;
 	vector<vector<bool> > visited; // To find one island I will start on unvisited land and go as far as possible to mark all neighbouring lands as visited.
 	
@@ -18,8 +18,21 @@ class visitedMap{
 				if( !visited[newY][newX] ) dfs( newY, newX );
 		}
 	}
+	void prepareVisited(){
+		for ( int y = 0; y < array.size(); y ++ ) rowSize = max ( rowSize, (int)array[y].size() );
+		
+		visited.resize ( array.size(), vector<bool>(rowSize, false) );
+		for ( int y = 0; y < array.size(); y ++ ){
+			for ( int x = 0; x < array[y].size(); x ++ ){
+				visited[y][x] = !array[y][x]; //water can be marked as visited cell - I don't want to stand on it looking for land.
+			}
+		}
+	}
 public:
+	vector<vector<bool> > array;
+	
 	int countIslands(){
+		prepareVisited();
 		int nrIslands = 0;
 
 		for ( int y = 0; y < visited.size(); y ++ ){
@@ -32,22 +45,16 @@ public:
 		}
 		return nrIslands;
 	}	
-	visitedMap( const vector<vector<bool> >& array ){
-		for ( int y = 0; y < array.size(); y ++ ) rowSize = max ( rowSize, (int)array[y].size() );
-		
-		visited.resize ( array.size(), vector<bool>(rowSize, false) );
-		for ( int y = 0; y < array.size(); y ++ ){
-			for ( int x = 0; x < array[y].size(); x ++ ){
-				visited[y][x] = !array[y][x]; //water can be marked as visited cell - I don't want to stand on it looking for land.
-			}
-		}
+	VisitedMap( const vector<vector<bool> >& grid ){
+		array = grid;
 	}
 };
 int countIslands( const vector<vector<bool> >& array ){
 	
-	visitedMap map( array );
+	VisitedMap map( array );
 	return map.countIslands();
-}
+}		
+
 int countIslandsFromString ( const vector<string> &array, int expectedValue ){
 	vector<vector<bool> > v;
 	v.resize ( array.size() );
