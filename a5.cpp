@@ -1,107 +1,108 @@
 #include<bits/stdc++.h>
 using namespace std;
+
 class Alphabet{
-	map < char, int > allLetters;
-	vector < char > numberedLetters;
 	
-	vector < vector < int > > orderGraph;
+	set < char > allLetters;
+	
+	vector < vector < char > > orderGraph;
 	vector < int > connectedWith;
 	
-	int firstDifferentPosition ( string& a, string &b ){
-		int minLength = min ( a.length(), b.length() );
+	int firstDifferentPosition ( const string& a, const string &b ){
+		
+		const int minLength = min ( a.length(), b.length() );
 		
 		for ( int i = 0; i < minLength; i ++ )
 			if ( a[i] != b[i] ) return i;
 		
-		return minLength;
+		return -1;
 	}
-	int findAllLetters ( vector<string>& dictionary ){
-		int counter = 0;
-		for ( int i = 0; i < dictionary.size(); i ++ ){
-	
-			string word = dictionary[i];
-			for ( int j = 0; j < word.length(); j ++ ) {
-				char letter = word[j];
-				if ( allLetters.find ( letter ) == allLetters.end() ){
-					allLetters[letter] = ++ counter;
-					numberedLetters.push_back ( letter );
-				}
-			}
-		}
-		return counter;
+	int findAllLetters ( const vector<string>& dictionary ){
+		
+		for (const string &word : dictionary)
+			for (const char letter : word)
+				allLetters.insert(letter);
+
+		return allLetters.size();
 	}
 	vector < char > topSorting (){
+		
 		vector < char > sortedLetters;
-
 		queue < char > lettersToTake;
-		for ( pair < char, int > letter : allLetters ){
-			char cLetter = letter.first; //as charLetter
-			int nLetter = letter.second; //as numberOfLetter
-			if ( connectedWith[nLetter] == 0 ) 
-				lettersToTake.push ( cLetter );
+		
+		for ( const char letter : allLetters ){
+			
+			if ( connectedWith[letter] == 0 ) //find letters which don't have any connections back - they could be the first letter in the alphabet
+				lettersToTake.push ( letter ); 
 		}
 		while ( lettersToTake.size() ){
-			char cLetter = lettersToTake.front(); //as charLetter
-			int nLetter = allLetters[cLetter]; //as numberOfLetter
 			
+			const char letter = lettersToTake.front(); //if you take the letter it means that all letters which should be before this one are processed
 			lettersToTake.pop();
-			sortedLetters.push_back ( cLetter );
 			
-			for ( int i = 0; i < orderGraph[nLetter].size(); i ++ ){
-				int nextLetter = orderGraph[nLetter][i];
+			sortedLetters.push_back ( letter );
+			
+			for ( const char nextLetter: orderGraph[letter] ){
 				
-				connectedWith[nextLetter] --;
+				connectedWith[nextLetter] --; //as you process the next connection, check if all letters which should be before this one are processed (or in queue)
 				if ( connectedWith[nextLetter] == 0 )
-					lettersToTake.push ( numberedLetters[nextLetter - 1] );
+					lettersToTake.push ( nextLetter ); //if so, you can process this letter
 			}
 		}
 		return sortedLetters;
 	}
 public:
-	vector<char> findTheAlphabet ( vector<string>& dictionary ){
+	vector<char> findTheAlphabet ( const vector<string>& dictionary ){
 		
-		int sizeOfAlphabet = findAllLetters ( dictionary );
+		findAllLetters ( dictionary );
 		
-		orderGraph.resize ( sizeOfAlphabet + 1 );
-		connectedWith.resize ( sizeOfAlphabet + 1, 0 );
+		orderGraph.resize ( 200 );
+		connectedWith.resize ( 200, 0 );
 		
-		for ( int i = 0; i < dictionary.size(); i ++ ){
-			for ( int j = i + 1; j < dictionary.size(); j ++ ){
-				int differentPos = firstDifferentPosition ( dictionary[i], dictionary[j] );
+		for ( int i = 0; i < dictionary.size() - 1; i ++ ){
+			
+			const int differentPos = firstDifferentPosition ( dictionary[i], dictionary[i + 1] );
+			if ( differentPos != -1 ){
 				
-				if ( differentPos < dictionary[i].size() && differentPos < dictionary[j].size() ){
-					
-					char letter1 = dictionary[i][differentPos], letter2 = dictionary[j][differentPos];
-					
-					int nrOfLetter1 = allLetters[letter1], nrOfLetter2 = allLetters[letter2];
-					cerr << letter1 << " < " << letter2 << "\n";
-					orderGraph[nrOfLetter1].push_back ( nrOfLetter2 );
-					
-					connectedWith [ nrOfLetter2 ] ++;
-				}
+				const char letter1 = dictionary[i][differentPos], letter2 = dictionary[i + 1][differentPos];
+				
+				orderGraph[letter1].push_back ( letter2 ); //connection: letter1 should be in the alphabet before letter2
+				
+				connectedWith [ letter2 ] ++; //letter2 has one more letters which should be before it in the alphabet
 			}
 		}
 		return topSorting();
 	}
 };
-void printAlphabet ( vector<char> alphabet ){
+
+void printAlphabet ( const vector<char> alphabet ){
+	
 	cout << "[ ";
+	
 	for ( int i = 0; i < alphabet.size(); i ++ ) {
 		cout << alphabet[i];
 		if ( i + 1 < alphabet.size() ) cout << ", ";
 	}
+	
 	cout << "]\n";
 }
-vector<char> findTheAlphabet ( vector<string>& dictionary ){
+
+vector<char> findTheAlphabet ( const vector<string>& dictionary ){
+	
 	Alphabet alpha;
 	return alpha.findTheAlphabet ( dictionary );
 }
+	
 int main (){
+	
 	vector < string > dict = { "art", "rat", "cat", "car" };
 	printAlphabet ( findTheAlphabet ( dict ) );
+	
 	dict = { "a", "abc", "abd", "bb", "bd" };
 	printAlphabet ( findTheAlphabet ( dict ) );
+	
 	dict = { "z", "yx", "yz", "a" };
 	printAlphabet ( findTheAlphabet ( dict ) );
+	
 	return 0;
 }
