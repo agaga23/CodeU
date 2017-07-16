@@ -5,7 +5,7 @@ class Alphabet{
 	
 	set < char > allLetters;
 	
-	vector < vector < char > > orderGraph;
+	vector < set < char > > orderGraph;
 	vector < int > connectedWith;
 	
 	int firstDifferentPosition ( const string& a, const string &b ){
@@ -56,19 +56,21 @@ public:
 		
 		findAllLetters ( dictionary );
 		
-		orderGraph.resize ( 200 );
-		connectedWith.resize ( 200, 0 );
+		orderGraph.resize ( 256 );
+		connectedWith.resize ( 256, 0 );
 		
-		for ( int i = 0; i < dictionary.size() - 1; i ++ ){
+		for ( int i = 0; i + 1 < dictionary.size(); i ++ ){
 			
 			const int differentPos = firstDifferentPosition ( dictionary[i], dictionary[i + 1] );
 			if ( differentPos != -1 ){
 				
 				const char letter1 = dictionary[i][differentPos], letter2 = dictionary[i + 1][differentPos];
 				
-				orderGraph[letter1].push_back ( letter2 ); //connection: letter1 should be in the alphabet before letter2
-				
-				connectedWith [ letter2 ] ++; //letter2 has one more letters which should be before it in the alphabet
+				if ( orderGraph[letter1].find ( letter2 ) == orderGraph[letter1].end() ){
+					orderGraph[letter1].insert ( letter2 ); //connection: letter1 should be in the alphabet before letter2
+					
+					connectedWith [ letter2 ] ++; //letter2 has one more letters which should be before it in the alphabet
+				}
 			}
 		}
 		return topSorting();
@@ -102,6 +104,12 @@ int main (){
 	printAlphabet ( findTheAlphabet ( dict ) );
 	
 	dict = { "z", "yx", "yz", "a" };
+	printAlphabet ( findTheAlphabet ( dict ) );
+
+	dict = { "abca" };
+	printAlphabet ( findTheAlphabet ( dict ) );
+
+	dict = { "" };
 	printAlphabet ( findTheAlphabet ( dict ) );
 	
 	return 0;
