@@ -4,9 +4,9 @@ using namespace std;
 class Alphabet{
 	
 	set < char > allLetters;
-	
-	vector < set < char > > orderGraph;
-	vector < int > connectedWith;
+		
+	map<char, set<char> > orderGraph;
+	map<char, int> connectedWith;
 	
 	int firstDifferentPosition ( const string& a, const string &b ){
 		
@@ -55,9 +55,6 @@ public:
 	vector<char> findTheAlphabet ( const vector<string>& dictionary ){
 		
 		findAllLetters ( dictionary );
-		
-		orderGraph.resize ( 256 );
-		connectedWith.resize ( 256, 0 );
 		
 		for ( int i = 0; i + 1 < dictionary.size(); i ++ ){
 			
